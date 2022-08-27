@@ -1,3 +1,7 @@
+import PaymentTab from '../../../components/Payment';
+
 export default function Payment() {
-  return 'Pagamento: Em breve!';
+  return (
+    <PaymentTab />
+  );
 }
