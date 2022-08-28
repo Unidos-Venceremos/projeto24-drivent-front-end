@@ -99,6 +99,18 @@ export default function PaymentTab() {
         :
         <></>
       }
+
+      {selectTicket.presential && (selectHosting.withHotel || selectHosting.withoutHotel) ?
+        <>
+          <Spacer height={44} />
+          <SubTitle>Fechado! O total ficou em
+            {selectHosting.withHotel ? <strong>R$ 600</strong> : <strong>R$ 250</strong>}
+            . Agora é só confirmar:</SubTitle>
+          <GreyButton onClick={() => console.log('selectHosting: ', selectHosting)}>RESERVAR INGRESSO</GreyButton>
+        </>
+        :
+        <></>
+      }
     </>
   );
 }
