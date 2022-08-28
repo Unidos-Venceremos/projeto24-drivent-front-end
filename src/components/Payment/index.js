@@ -5,6 +5,7 @@ import Button from './Button';
 
 import useTicket from '../../hooks/api/useTicket';
 import useBedroom from '../../hooks/api/useBedroom';
+import GreyButton from './GreyButton';
 
 const PRESENTIAL = 'presential';
 const ONLINE = 'online';
@@ -88,6 +89,16 @@ export default function PaymentTab() {
           )}
         </>
       )}
+
+      {selectTicket.online ?
+        <>
+          <Spacer height={44} />
+          <SubTitle>Fechado! O total ficou em <strong>R$ 100</strong>. Agora é só confirmar:</SubTitle>
+          <GreyButton onClick={() => console.log('selectTicket: ', selectTicket)}>RESERVAR INGRESSO</GreyButton>
+        </>
+        :
+        <></>
+      }
     </>
   );
 }
