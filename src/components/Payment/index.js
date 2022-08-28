@@ -4,43 +4,90 @@ import styled from 'styled-components';
 import Button from './Button';
 
 import useTicket from '../../hooks/api/useTicket';
+import useBedroom from '../../hooks/api/useBedroom';
+
+const PRESENTIAL = 'presential';
+const ONLINE = 'online';
+const WITHOUT_HOTEL = 'withoutHotel';
+const WITH_HOTEL = 'withHotel';
 
 export default function PaymentTab() {
   const { ticket } = useTicket();
+  const { bedroom } = useBedroom();
 
   const [availableTickets, setAvailableTickets] = useState({ presential: 0, online: 0 });
+  const [selectTicket, setSelectTicket] = useState({ presential: false, online: false });
+  const [selectHosting, setSelectHosting] = useState({ withoutHotel: false, withHotel: false });
 
   useEffect(() => {
     if (ticket) {
       let presentialCount = 0;
       let onlineCount = 0;
 
-      ticket.forEach(element => {
+      ticket.forEach((element) => {
         element.presential ? presentialCount++ : onlineCount++;
       });
-      
+
       setAvailableTickets({ presential: presentialCount, online: onlineCount });
     }
   }, [!ticket]);
+
+  const handleSelectTicket = (ticketType) => {
+    const allTypesOfTickets = { presential: false, online: false };
+    const allTypesOfHosting = { withoutHotel: false, withHotel: false };
+
+    if (selectTicket[ticketType]) {
+      setSelectTicket(allTypesOfTickets);
+      setSelectHosting(allTypesOfHosting);
+    } else setSelectTicket({ ...allTypesOfTickets, [ticketType]: true });
+
+    if (ticketType === ONLINE) setSelectHosting(allTypesOfHosting);
+  };
+
+  const handleSelectHosting = (hostingType) => {
+    const allTypesOfHosting = { withoutHotel: false, withHotel: false };
+
+    if (selectHosting[hostingType]) setSelectHosting(allTypesOfHosting);
+    else setSelectHosting({ ...allTypesOfHosting, [hostingType]: true });
+  };
 
   return (
     <>
       <Title>Ingresso e pagamento</Title>
       <SubTitle>Primeiro, escolha sua modalidade de ingresso</SubTitle>
-      <Button 
-        onClick={() => console.log('availableTickets: ', availableTickets)} 
+      <Button
+        onClick={() => handleSelectTicket(PRESENTIAL)}
+        selected={selectTicket.presential}
         disabled={!availableTickets.presential}
       >
         <h1>Presencial</h1>
         <h2>R$ 250</h2>
       </Button>
-      <Button 
-        onClick={() => console.log('availableTickets: ', availableTickets)} 
+      <Button
+        onClick={() => handleSelectTicket(ONLINE)}
+        selected={selectTicket.online}
         disabled={!availableTickets.online}
       >
         <h1>Online</h1>
         <h2>R$ 100</h2>
       </Button>
+
+      {selectTicket && selectTicket?.presential && (
+        <>
+          <Spacer height={20} />
+          <SubTitle>Ótimo! Agora escolha sua modalidade de hospedagem</SubTitle>
+          <Button onClick={() => handleSelectHosting(WITHOUT_HOTEL)} selected={selectHosting.withoutHotel}>
+            <h1>Sem Hotel</h1>
+            <h2>+ R$ 0</h2>
+          </Button>
+          {bedroom && bedroom?.length > 0 && (
+            <Button onClick={() => handleSelectHosting(WITH_HOTEL)} selected={selectHosting.withHotel}>
+              <h1>Com Hotel</h1>
+              <h2>+ R$ 350</h2>
+            </Button>
+          )}
+        </>
+      )}
     </>
   );
 }
@@ -62,5 +109,9 @@ const SubTitle = styled.h2`
   line-height: 23px;
   margin-bottom: 17px;
 
-  color: #8E8E8E;
+  color: #8e8e8e;
+`;
+
+const Spacer = styled.div`
+  height: ${(props) => props.height || '0'}px;
 `;

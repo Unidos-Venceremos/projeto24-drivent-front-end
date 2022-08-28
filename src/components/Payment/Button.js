@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-export default function Button({ variant='contained', children, ...props }) {
+export default function Button({ variant = 'contained', children, ...props }) {
   return (
     <StyledButton variant={variant} {...props}>
       {children}
@@ -13,9 +13,10 @@ const StyledButton = styled.button`
   height: 145px;
   margin-right: 24px;
 
-  border: 1px solid #CECECE;
+  border: ${(props) => (props.selected ? '1px solid #FFEED2' : '1px solid #cecece')};
   border-radius: 20px;
-  background-color: #FFFFFF;
+  background-color: ${(props) => (props.selected ? '#FFEED2' : '#FFFFFF')};
+  cursor: pointer;
 
   h1 {
     font-style: normal;
