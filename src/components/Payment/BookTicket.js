@@ -1,4 +1,7 @@
 import styled from 'styled-components';
+import 'react-credit-cards/es/styles-compiled.css';
+
+import CreditCardContainer from './CreditCardContainer.js';
 
 export default function BookTicket(props) {
   const generateText = () => {
@@ -23,6 +26,10 @@ export default function BookTicket(props) {
     if (online) return 'R$ 100,00';
   };
 
+  const handleSubmit = (e) => {
+    e.prevendDefault();
+  };
+
   return (
     <>
       <SubTitle>Ingresso escolhido</SubTitle>
@@ -31,9 +38,21 @@ export default function BookTicket(props) {
         <Spacer height={8} />
         <h2>{generateValue()}</h2>
       </Button>
+      <Spacer height={20} />
+      <SubTitle>Pagamento</SubTitle>
+      <Form onSubmit={handleSubmit}>
+        <CreditCardContainer />
+        <Spacer height={50} />
+        <GreyButton type="submit">FINALIZAR PAGAMENTO</GreyButton>
+      </Form>
     </>
   );
 }
+
+const Form = styled.form`
+  display: flex;
+  flex-direction: column;
+`;
 
 const SubTitle = styled.h2`
   font-style: normal;
@@ -74,6 +93,18 @@ const Button = styled.button`
 
     color: #898989;
   }
+`;
+
+const GreyButton = styled.button`
+  width: max-content;
+  height: 37px;
+  padding: 10px 20px;
+
+  background: #e0e0e0;
+  box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.25);
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
 `;
 
 const Spacer = styled.div`
