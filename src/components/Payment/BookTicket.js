@@ -1,13 +1,15 @@
 import styled from 'styled-components';
 import 'react-credit-cards/es/styles-compiled.css';
+import { toast } from 'react-toastify';
 
 import CreditCardContainer from './CreditCardContainer.js';
+import check from '../../assets/images/check.jpg';
 
 export default function BookTicket(props) {
-  const generateText = () => {
-    const { presential, online } = props.ticket;
-    const { withoutHotel, withHotel } = props.hosting;
+  const { presential, online } = props.ticket;
+  const { withoutHotel, withHotel } = props.hosting;
 
+  const generateText = () => {
     if (presential && withoutHotel) return 'Presencial + Sem Hotel';
 
     if (presential && withHotel) return 'Presencial + Com Hotel';
@@ -16,9 +18,6 @@ export default function BookTicket(props) {
   };
 
   const generateValue = () => {
-    const { presential, online } = props.ticket;
-    const { withoutHotel, withHotel } = props.hosting;
-
     if (presential && withoutHotel) return 'R$ 250,00';
 
     if (presential && withHotel) return 'R$ 600,00';
@@ -26,8 +25,15 @@ export default function BookTicket(props) {
     if (online) return 'R$ 100,00';
   };
 
-  const handleSubmit = (e) => {
-    e.prevendDefault();
+  const handleSubmit = async(e) => {
+    e.preventDefault();
+    try {
+      await props.updateTicket(presential);
+      toast('Pagamento feito com sucesso!');
+      props.setShowPaymentConfirm(true);
+    } catch (err) {
+      toast(err.message);
+    }
   };
 
   return (
@@ -40,11 +46,23 @@ export default function BookTicket(props) {
       </Button>
       <Spacer height={20} />
       <SubTitle>Pagamento</SubTitle>
-      <Form onSubmit={handleSubmit}>
-        <CreditCardContainer />
-        <Spacer height={50} />
-        <GreyButton type="submit">FINALIZAR PAGAMENTO</GreyButton>
-      </Form>
+
+      {
+        props.showPaymentConfirm ? (
+          <PaymentSuccess>
+            <img src={check} alt="check" />
+            <PaymentMessage>
+              <span>Pagamento confirmado!</span> Prossiga para escolha de hospedagem e atividades
+            </PaymentMessage>
+          </PaymentSuccess>
+        ) : (
+          <Form onSubmit={handleSubmit}>
+            <CreditCardContainer />
+            <Spacer height={50} />
+            <GreyButton disabled={props.ticketLoading} type="submit">FINALIZAR PAGAMENTO</GreyButton>
+          </Form>
+        )
+      }
     </>
   );
 }
@@ -109,4 +127,28 @@ const GreyButton = styled.button`
 
 const Spacer = styled.div`
   height: ${(props) => props.height || '0'}px;
+`;
+
+const PaymentMessage = styled.p`
+  display: flex;
+  flex-direction: column;
+  font-family: 'Roboto';
+  font-style: normal;
+  font-size: 16px;
+  line-height: 19px;
+  color: #454545;
+  span{
+    font-weight: 700;
+  }
+`;
+
+const PaymentSuccess = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  
+  img{
+    width: 41px;
+    margin-right: 15px;
+  }
 `;

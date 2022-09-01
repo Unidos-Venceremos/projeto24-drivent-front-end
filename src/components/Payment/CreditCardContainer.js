@@ -60,12 +60,27 @@ export default function CreditCardContainer(props) {
           onChange={handleInputChange}
           onFocus={handleInputFocus}
           maxLength={30}
+          required
         />
 
         <ColumnContainer>
-          <Input type="tel" name="expiry" placeholder="Expiration Date" onChange={handleInputChange} width="180%" />
+          <Input
+            type="tel"
+            name="expiry"
+            placeholder="Expiration Date"
+            onChange={handleInputChange}
+            width="180%"
+            required
+          />
           <Spacer width="30px" />
-          <Input type="tel" name="cvc" placeholder="CVC" onChange={handleInputChange} onFocus={handleInputFocus} />
+          <Input
+            type="tel"
+            name="cvc"
+            placeholder="CVC"
+            onChange={handleInputChange}
+            onFocus={handleInputFocus}
+            required
+          />
         </ColumnContainer>
       </FormContainer>
     </CardContainer>
