@@ -1,6 +1,7 @@
-import { useContext, useState } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import dotenv from 'dotenv';
 
 import AuthLayout from '../../layouts/Auth';
 
@@ -19,7 +20,6 @@ export default function Enroll() {
   const [confirmPassword, setConfirmPassword] = useState('');
 
   const { loadingSignUp, signUp } = useSignUp();
-
   const navigate = useNavigate();
   
   const { eventInfo } = useContext(EventInfoContext);
@@ -40,6 +40,14 @@ export default function Enroll() {
     }
   }
 
+  function redirectToGitHub() {
+    console.log('redirectToGitHub');
+    dotenv.config();
+    const GITHUB_AUTH_URL = 'https://github.com/login/oauth/authorize?client_id=b00f6d76d8b0696503a7';
+    const authorizationUrl = `${GITHUB_AUTH_URL}`;
+    window.location.href = authorizationUrl;  
+  }
+  
   return (
     <AuthLayout background={eventInfo.backgroundImageUrl}>
       <Row>
@@ -54,6 +62,13 @@ export default function Enroll() {
           <Input label="Repita sua senha" type="password" fullWidth value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} />
           <Button type="submit" color="primary" fullWidth disabled={loadingSignUp}>Inscrever</Button>
         </form>
+      </Row>
+      <Row>
+        <h2>ou</h2>
+        <Button onClick={redirectToGitHub} color="primary" fullWidth disabled={loadingSignUp}>
+          <img src={'https://www.svgrepo.com/show/332401/github.svg'} width="18px" />
+          <h2>Login usando GitHub</h2>
+        </Button>
       </Row>
       <Row>
         <Link to="/sign-in">Já está inscrito? Faça login</Link>

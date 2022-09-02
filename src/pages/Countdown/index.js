@@ -1,5 +1,6 @@
 import { useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 import Timer from './Timer';
 import Page from '../../components/Page';
@@ -13,8 +14,27 @@ export default function Countdown() {
   const navigate = useNavigate();
   const countdownOver = useIsDateAfter(eventInfo?.startsAt);
 
+  //http://localhost:3000/?code=43421690725e06f5100d
+
   useEffect(() => {
-    if (countdownOver) {
+    const urlParams = new URLSearchParams(window.location.search);
+    console.log('urlParams, href = ', window.location.href);
+    console.log('urlParams, search = ', window.location.search);
+    const code = urlParams.get('code');
+    console.log('urlParams, code = ', code);
+    
+    if(code) {
+      try {
+        navigate('/dashboard');
+        const response = axios.post('http://localhost:4000/login', { code });
+        const user = response.data;
+        alert('você está logado, meu chapa! dá uma olhada no console!');
+        console.log(user);
+      } catch (err) {
+        alert('ops, deu algum xabú');
+        console.log('err', err);
+      }
+    } else if (countdownOver) {
       navigate('/enroll');
     }
   }, [countdownOver]);
