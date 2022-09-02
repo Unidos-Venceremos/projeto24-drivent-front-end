@@ -1,18 +1,10 @@
-import { useState } from 'react';
 import Cards from 'react-credit-cards';
 import styled from 'styled-components';
 
 import { formatCreditCardNumber, formatName, formatCVC, formatExpirationDate } from '../../utils/formatters.js';
 
 export default function CreditCardContainer(props) {
-  const [creditCard, setCreditCard] = useState({
-    cvc: '',
-    expiry: '',
-    name: '',
-    number: '',
-    focused: '',
-  });
-
+  const { creditCard, setCreditCard } = props;
   const handleInputFocus = ({ target }) => {
     setCreditCard({ ...creditCard, focused: target.name });
   };
@@ -24,7 +16,7 @@ export default function CreditCardContainer(props) {
       target.value = formatExpirationDate(target.value);
     } else if (target.name === 'cvc') {
       target.value = formatCVC(target.value);
-    } else if (target.name === 'name') {
+    } else if (target.name === 'holder') {
       target.value = formatName(target.value);
     }
 
@@ -55,17 +47,36 @@ export default function CreditCardContainer(props) {
         <Small>E.g.: 49..., 51..., 36..., 37...</Small>
         <Input
           type="tel"
-          name="name"
-          placeholder="Name"
+          name="holder"
+          placeholder="Holder Name"
           onChange={handleInputChange}
           onFocus={handleInputFocus}
           maxLength={30}
+          minLength={2}
+          required
         />
 
         <ColumnContainer>
-          <Input type="tel" name="expiry" placeholder="Expiration Date" onChange={handleInputChange} width="180%" />
+          <Input
+            type="tel"
+            name="expiry"
+            placeholder="Expiration Date"
+            onChange={handleInputChange}
+            width="180%"
+            required
+            minLength={5}
+            maxLength={5}
+          />
           <Spacer width="30px" />
-          <Input type="tel" name="cvc" placeholder="CVC" onChange={handleInputChange} onFocus={handleInputFocus} />
+          <Input
+            type="tel"
+            name="cvv"
+            placeholder="CVC"
+            onChange={handleInputChange}
+            onFocus={handleInputFocus}
+            required
+            minLength={3}
+          />
         </ColumnContainer>
       </FormContainer>
     </CardContainer>
