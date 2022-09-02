@@ -1,6 +1,7 @@
 import { useState, useContext } from 'react';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import qs from 'query-string';
 
 import AuthLayout from '../../layouts/Auth';
 
@@ -39,9 +40,17 @@ export default function SignIn() {
   } 
 
   function redirectToGitHub() {
-    console.log('redirectToGitHub');
-    const GITHUB_AUTH_URL = `https://github.com/login/oauth/authorize?client_id=${process.env.REACT_APP_CLIENT_ID}`;
-    const authorizationUrl = `${GITHUB_AUTH_URL}`;
+    const GITHUB_AUTH_URL = 'https://github.com/login/oauth/authorize';
+    const params = {
+      response_type: 'code',
+      scope: 'user public_repo',
+      client_id: process.env.REACT_APP_CLIENT_ID,
+      redirect_uri: process.env.REACT_APP_REDIRECT_URL,
+      state: 'driven.tt'
+    };
+
+    const queryStrings = qs.stringify(params);
+    const authorizationUrl = `${GITHUB_AUTH_URL}?${queryStrings}`;
     window.location.href = authorizationUrl;  
   }
 

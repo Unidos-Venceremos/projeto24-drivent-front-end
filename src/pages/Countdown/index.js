@@ -26,9 +26,10 @@ export default function Countdown() {
     if(code) {
       try {
         navigate('/dashboard');
-        const response = axios.post('http://localhost:4000/login', { code });
+        console.log(`${process.env.REACT_APP_API_BASE_URL}/auth`);
+        const response = axios.post(`${process.env.REACT_APP_API_BASE_URL}/sign-in`, { code });
         const user = response.data;
-        alert('você está logado, meu chapa! dá uma olhada no console!');
+        //alert('você está logado, meu chapa! dá uma olhada no console!');
         console.log(user);
       } catch (err) {
         alert('ops, deu algum xabú');
