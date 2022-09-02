@@ -8,7 +8,7 @@ import useBedroom from '../../hooks/api/useBedroom.js';
 import GreyButton from './GreyButton.js';
 import BookTicket from './BookTicket.js';
 import useEnrollment from '../../hooks/api/useEnrollment.js';
-import useUpdateTicket from '../../hooks/api/useUpdateTicket.js';
+import usePayment from '../../hooks/api/usePayment.js';
 import useTicketByUserId from '../../hooks/api/useTicketbyId.js';
 
 const PRESENTIAL = 'presential';
@@ -17,7 +17,7 @@ const WITHOUT_HOTEL = 'withoutHotel';
 const WITH_HOTEL = 'withHotel';
 
 export default function PaymentTab() {
-  const { updateTicket, ticketLoading } = useUpdateTicket();
+  const { Payment, paymentLoading } = usePayment();
   const { ticket: ticketById } = useTicketByUserId();
   const { ticket } = useTicket();
   const { bedroom } = useBedroom();
@@ -35,10 +35,14 @@ export default function PaymentTab() {
       setShowPaymentConfirm(true);
       if(ticketById.presential) {
         setSelectTicket({ presential: true, online: false });
-        setSelectHosting({ withoutHotel: true, withHotel: false });
+        setSelectHosting({ withoutHotel: !ticketById.withHotel, withHotel: ticketById.withHotel });
+      }
+      else{
+        setSelectTicket({ presential: false, online: true });
+        setSelectHosting({ withoutHotel: false, withHotel: false });
       }
     }
-  }, [ticketById]);
+  }, [!ticketById]);
 
   useEffect(() => {
     if (ticket) {
@@ -87,8 +91,8 @@ export default function PaymentTab() {
           hosting={selectHosting}
           showPaymentConfirm={showPaymentConfirm}
           setShowPaymentConfirm={setShowPaymentConfirm}
-          updateTicket={updateTicket}
-          ticketLoading={ticketLoading}
+          Payment={Payment}
+          paymentLoading={paymentLoading}
         />
       ) : (
         <>

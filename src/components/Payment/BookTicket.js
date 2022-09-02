@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import styled from 'styled-components';
 import 'react-credit-cards/es/styles-compiled.css';
 import { toast } from 'react-toastify';
@@ -8,6 +9,13 @@ import check from '../../assets/images/check.jpg';
 export default function BookTicket(props) {
   const { presential, online } = props.ticket;
   const { withoutHotel, withHotel } = props.hosting;
+  const [creditCard, setCreditCard] = useState({
+    cvv: '',
+    expiry: '',
+    holder: '',
+    number: '',
+    focused: '',
+  });
 
   const generateText = () => {
     if (presential && withoutHotel) return 'Presencial + Sem Hotel';
@@ -27,12 +35,20 @@ export default function BookTicket(props) {
 
   const handleSubmit = async(e) => {
     e.preventDefault();
+    delete creditCard.focused;
+    const data = { ...creditCard, withHotel, presential };
+    // eslint-disable-next-line no-console
+    console.log(data);
     try {
-      await props.updateTicket(presential);
+      // eslint-disable-next-line no-console
+      console.log('passei aqui');
+      await props.Payment(data);
       toast('Pagamento feito com sucesso!');
       props.setShowPaymentConfirm(true);
     } catch (err) {
-      toast(err.message);
+      toast('Erro ao fazer o pagamento');
+      // eslint-disable-next-line no-console
+      console.log(err.message);
     }
   };
 
@@ -47,22 +63,22 @@ export default function BookTicket(props) {
       <Spacer height={20} />
       <SubTitle>Pagamento</SubTitle>
 
-      {
-        props.showPaymentConfirm ? (
-          <PaymentSuccess>
-            <img src={check} alt="check" />
-            <PaymentMessage>
-              <span>Pagamento confirmado!</span> Prossiga para escolha de hospedagem e atividades
-            </PaymentMessage>
-          </PaymentSuccess>
-        ) : (
-          <Form onSubmit={handleSubmit}>
-            <CreditCardContainer />
-            <Spacer height={50} />
-            <GreyButton disabled={props.ticketLoading} type="submit">FINALIZAR PAGAMENTO</GreyButton>
-          </Form>
-        )
-      }
+      {props.showPaymentConfirm ? (
+        <PaymentSuccess>
+          <img src={check} alt="check" />
+          <PaymentMessage>
+            <span>Pagamento confirmado!</span> Prossiga para escolha de hospedagem e atividades
+          </PaymentMessage>
+        </PaymentSuccess>
+      ) : (
+        <Form onSubmit={handleSubmit}>
+          <CreditCardContainer creditCard={creditCard} setCreditCard={setCreditCard} />
+          <Spacer height={50} />
+          <GreyButton disabled={props.paymentLoading} type="submit">
+            FINALIZAR PAGAMENTO
+          </GreyButton>
+        </Form>
+      )}
     </>
   );
 }
@@ -137,7 +153,7 @@ const PaymentMessage = styled.p`
   font-size: 16px;
   line-height: 19px;
   color: #454545;
-  span{
+  span {
     font-weight: 700;
   }
 `;
@@ -146,8 +162,8 @@ const PaymentSuccess = styled.div`
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  
-  img{
+
+  img {
     width: 41px;
     margin-right: 15px;
   }

@@ -19,14 +19,3 @@ export async function getTicketbyUserId(token) {
 
   return response.data;
 }
-
-export async function UpdateTicket(token, bool) {
-  const response = await api.put(`/tickets/${bool}`, {}, {
-    headers: {
-      Authorization: `Bearer ${token}`
-    },
-  });
-
-  return response.data;
-}
-//
