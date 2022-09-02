@@ -38,6 +38,13 @@ export default function SignIn() {
     }
   } 
 
+  function redirectToGitHub() {
+    console.log('redirectToGitHub');
+    const GITHUB_AUTH_URL = `https://github.com/login/oauth/authorize?client_id=${process.env.REACT_APP_CLIENT_ID}`;
+    const authorizationUrl = `${GITHUB_AUTH_URL}`;
+    window.location.href = authorizationUrl;  
+  }
+
   return (
     <AuthLayout background={eventInfo.backgroundImageUrl}>
       <Row>
@@ -51,6 +58,13 @@ export default function SignIn() {
           <Input label="Senha" type="password" fullWidth value={password} onChange={e => setPassword(e.target.value)} />
           <Button type="submit" color="primary" fullWidth disabled={loadingSignIn}>Entrar</Button>
         </form>
+      </Row>
+      <Row>
+        <h2>ou</h2>
+        <Button onClick={redirectToGitHub} fullWidth>
+          <h2>Login usando GitHub</h2>
+          <img src={'https://www.svgrepo.com/show/332401/github.svg'} width="20px" style= { { verticalAlign: 'middle', marginLeft: '8px', marginRight: '8px' } }/>
+        </Button>
       </Row>
       <Row>
         <Link to="/enroll">Não possui login? Inscreva-se</Link>

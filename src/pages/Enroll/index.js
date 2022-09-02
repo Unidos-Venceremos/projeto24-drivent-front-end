@@ -1,7 +1,6 @@
 import { useContext, useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
-import dotenv from 'dotenv';
 
 import AuthLayout from '../../layouts/Auth';
 
@@ -42,8 +41,7 @@ export default function Enroll() {
 
   function redirectToGitHub() {
     console.log('redirectToGitHub');
-    dotenv.config();
-    const GITHUB_AUTH_URL = 'https://github.com/login/oauth/authorize?client_id=b00f6d76d8b0696503a7';
+    const GITHUB_AUTH_URL = `https://github.com/login/oauth/authorize?client_id=${process.env.REACT_APP_CLIENT_ID}`;
     const authorizationUrl = `${GITHUB_AUTH_URL}`;
     window.location.href = authorizationUrl;  
   }
@@ -65,9 +63,9 @@ export default function Enroll() {
       </Row>
       <Row>
         <h2>ou</h2>
-        <Button onClick={redirectToGitHub} color="primary" fullWidth disabled={loadingSignUp}>
-          <img src={'https://www.svgrepo.com/show/332401/github.svg'} width="18px" />
+        <Button onClick={redirectToGitHub} fullWidth>
           <h2>Login usando GitHub</h2>
+          <img src={'https://www.svgrepo.com/show/332401/github.svg'} width="20px" style= { { verticalAlign: 'middle', marginLeft: '8px', marginRight: '8px' } }/>
         </Button>
       </Row>
       <Row>
