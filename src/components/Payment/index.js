@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import styled from 'styled-components';
 
 import Button from './Button';
@@ -10,6 +10,7 @@ import BookTicket from './BookTicket.js';
 import useEnrollment from '../../hooks/api/useEnrollment.js';
 import usePayment from '../../hooks/api/usePayment.js';
 import useTicketByUserId from '../../hooks/api/useTicketbyId.js';
+import TicketContext from '../../contexts/TicketContext';
 
 const PRESENTIAL = 'presential';
 const ONLINE = 'online';
@@ -17,6 +18,8 @@ const WITHOUT_HOTEL = 'withoutHotel';
 const WITH_HOTEL = 'withHotel';
 
 export default function PaymentTab() {
+  const { selectTicket, setSelectTicket, selectHosting, setSelectHosting, showPaymentConfirm, setShowPaymentConfirm } =
+    useContext(TicketContext);
   const { Payment, paymentLoading } = usePayment();
   const { ticket: ticketById } = useTicketByUserId();
   const { ticket } = useTicket();
@@ -24,20 +27,16 @@ export default function PaymentTab() {
   const enrollment = useEnrollment().enrollment;
 
   const [availableTickets, setAvailableTickets] = useState({ presential: 0, online: 0 });
-  const [selectTicket, setSelectTicket] = useState({ presential: false, online: false });
-  const [selectHosting, setSelectHosting] = useState({ withoutHotel: false, withHotel: false });
   const [showBookTicket, setShowBookTicket] = useState(false);
-  const [showPaymentConfirm, setShowPaymentConfirm] = useState(false);
 
   useEffect(() => {
     if (ticketById) {
       setShowBookTicket(true);
       setShowPaymentConfirm(true);
-      if(ticketById.presential) {
+      if (ticketById.presential) {
         setSelectTicket({ presential: true, online: false });
         setSelectHosting({ withoutHotel: !ticketById.withHotel, withHotel: ticketById.withHotel });
-      }
-      else{
+      } else {
         setSelectTicket({ presential: false, online: true });
         setSelectHosting({ withoutHotel: false, withHotel: false });
       }
@@ -172,12 +171,17 @@ const Title = styled.h1`
 `;
 
 const SubTitle = styled.h2`
+  height: 70%;
+  width: 60%;
   font-style: normal;
   font-weight: 400;
   font-size: 20px;
   line-height: 23px;
   margin-bottom: 17px;
-
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
   color: #8e8e8e;
 `;
 
