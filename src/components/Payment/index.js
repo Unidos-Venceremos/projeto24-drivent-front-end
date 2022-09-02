@@ -18,7 +18,8 @@ const WITHOUT_HOTEL = 'withoutHotel';
 const WITH_HOTEL = 'withHotel';
 
 export default function PaymentTab() {
-  const { selectTicket, setSelectTicket, selectHosting, setSelectHosting } = useContext(TicketContext);
+  const { selectTicket, setSelectTicket, selectHosting, setSelectHosting, showPaymentConfirm, setShowPaymentConfirm } =
+    useContext(TicketContext);
   const { Payment, paymentLoading } = usePayment();
   const { ticket: ticketById } = useTicketByUserId();
   const { ticket } = useTicket();
@@ -27,17 +28,15 @@ export default function PaymentTab() {
 
   const [availableTickets, setAvailableTickets] = useState({ presential: 0, online: 0 });
   const [showBookTicket, setShowBookTicket] = useState(false);
-  const [showPaymentConfirm, setShowPaymentConfirm] = useState(false);
 
   useEffect(() => {
     if (ticketById) {
       setShowBookTicket(true);
       setShowPaymentConfirm(true);
-      if(ticketById.presential) {
+      if (ticketById.presential) {
         setSelectTicket({ presential: true, online: false });
         setSelectHosting({ withoutHotel: !ticketById.withHotel, withHotel: ticketById.withHotel });
-      }
-      else{
+      } else {
         setSelectTicket({ presential: false, online: true });
         setSelectHosting({ withoutHotel: false, withHotel: false });
       }
