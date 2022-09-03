@@ -1,7 +1,8 @@
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import qs from 'query-string';
+import axios from 'axios';
 
 import AuthLayout from '../../layouts/Auth';
 
@@ -25,13 +26,36 @@ export default function SignIn() {
   const { setUserData } = useContext(UserContext);
 
   const navigate = useNavigate();
-  
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const code = urlParams.get('code');
+
+  useEffect(() => {
+    if(code) {
+      loginWithGitHub();
+    }
+  }, []);
+
+  async function loginWithGitHub() {
+    try {
+      console.log('Tenho um code! Code = ', code);
+      const user = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/oauth`, { code });
+      console.log('OAUTH: ', user.data);
+      setUserData(user.data);
+      toast('Login realizado com sucesso!');
+      navigate('/dashboard');
+    } catch (err) {
+      toast('Não foi possível fazer o login!');
+    }
+  }
+
   async function submit(event) {
     event.preventDefault();
 
     try {
       const userData = await signIn(email, password);
       setUserData(userData);
+      console.log('userData: ', userData);
       toast('Login realizado com sucesso!');
       navigate('/dashboard');
     } catch (err) {
