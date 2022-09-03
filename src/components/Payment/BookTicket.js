@@ -10,7 +10,7 @@ export default function BookTicket(props) {
   const { presential, online } = props.ticket;
   const { withoutHotel, withHotel } = props.hosting;
   const [creditCard, setCreditCard] = useState({
-    cvv: '',
+    cvc: '',
     expiry: '',
     holder: '',
     number: '',
@@ -35,13 +35,18 @@ export default function BookTicket(props) {
 
   const handleSubmit = async(e) => {
     e.preventDefault();
-    delete creditCard.focused;
-    const data = { ...creditCard, withHotel, presential };
+
+    const creditData = {
+      cvv: creditCard.cvc,
+      expiry: creditCard.expiry,
+      holder: creditCard.holder,
+      number: creditCard.number,
+    };
+
+    const data = { ...creditData, withHotel, presential };
     // eslint-disable-next-line no-console
-    console.log(data);
     try {
       // eslint-disable-next-line no-console
-      console.log('passei aqui');
       await props.Payment(data);
       toast('Pagamento feito com sucesso!');
       props.setShowPaymentConfirm(true);
@@ -148,13 +153,15 @@ const Spacer = styled.div`
 const PaymentMessage = styled.p`
   display: flex;
   flex-direction: column;
-  font-family: 'Roboto';
+  font-family: 'Roboto', sans-serif;
   font-style: normal;
   font-size: 16px;
   line-height: 19px;
   color: #454545;
   span {
+    display: inline-block;
     font-weight: 700;
+    margin-bottom: 2px;
   }
 `;
 

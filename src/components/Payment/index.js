@@ -115,7 +115,7 @@ export default function PaymentTab() {
 
           {selectTicket && selectTicket?.presential && (
             <>
-              <Spacer height={20} />
+              <Spacer height={44} />
               <SubTitle>Ótimo! Agora escolha sua modalidade de hospedagem</SubTitle>
               <Button onClick={() => handleSelectHosting(WITHOUT_HOTEL)} selected={selectHosting.withoutHotel}>
                 <h1>Sem Hotel</h1>
@@ -171,17 +171,13 @@ const Title = styled.h1`
 `;
 
 const SubTitle = styled.h2`
-  height: 70%;
-  width: 60%;
+  width: 90%;
   font-style: normal;
   font-weight: 400;
   font-size: 20px;
   line-height: 23px;
   margin-bottom: 17px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto;
+  text-align: left;
   color: #8e8e8e;
 `;
 

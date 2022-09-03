@@ -28,7 +28,7 @@ export default function CreditCardContainer(props) {
       <Cards
         cvc={creditCard.cvc}
         expiry={creditCard.expiry}
-        name={creditCard.name}
+        name={creditCard.holder}
         number={creditCard.number}
         focused={creditCard.focused}
       />
@@ -62,6 +62,7 @@ export default function CreditCardContainer(props) {
             name="expiry"
             placeholder="Expiration Date"
             onChange={handleInputChange}
+            onFocus={handleInputFocus}
             width="180%"
             required
             minLength={5}
@@ -70,8 +71,8 @@ export default function CreditCardContainer(props) {
           <Spacer width="30px" />
           <Input
             type="tel"
-            name="cvv"
-            placeholder="CVC"
+            name="cvc"
+            placeholder="CVV"
             onChange={handleInputChange}
             onFocus={handleInputFocus}
             required
@@ -85,7 +86,14 @@ export default function CreditCardContainer(props) {
 
 const CardContainer = styled.section`
   display: flex;
+  min-width: 340px;
   max-width: 80%;
+
+  @media (max-width: 768px) {
+    margin-top: 20px;
+    max-width: 100%;
+    flex-direction: column;
+  }
 `;
 
 const FormContainer = styled.div`
@@ -94,10 +102,17 @@ const FormContainer = styled.div`
   align-items: center;
   justify-content: center;
   width: 100%;
+  min-width: 300px;
   height: 100%;
   background-color: #fff;
   border-radius: 10px;
   padding: 5px 20px;
+
+  @media (max-width: 768px) {
+    margin-top: 20px;
+    max-width: 400px;
+    padding: 0px;
+  }
 `;
 
 const ColumnContainer = styled.div`
