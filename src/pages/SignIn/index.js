@@ -38,9 +38,7 @@ export default function SignIn() {
 
   async function loginWithGitHub() {
     try {
-      console.log('Tenho um code! Code = ', code);
       const user = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/oauth`, { code });
-      console.log('OAUTH: ', user.data);
       setUserData(user.data);
       toast('Login realizado com sucesso!');
       navigate('/dashboard');
