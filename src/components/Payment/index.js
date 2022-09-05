@@ -35,7 +35,10 @@ export default function PaymentTab() {
       setShowPaymentConfirm(true);
       if (ticketById.presential) {
         setSelectTicket({ presential: true, online: false });
-        setSelectHosting({ withoutHotel: !ticketById.withHotel, withHotel: ticketById.withHotel });
+        setSelectHosting({
+          withoutHotel: ticketById?.Payment.withHotel || false,
+          withHotel: !ticketById?.Payment.withHotel || false,
+        });
       } else {
         setSelectTicket({ presential: false, online: true });
         setSelectHosting({ withoutHotel: false, withHotel: false });
