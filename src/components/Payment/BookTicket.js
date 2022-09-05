@@ -44,9 +44,7 @@ export default function BookTicket(props) {
     };
 
     const data = { ...creditData, withHotel, presential };
-    // eslint-disable-next-line no-console
     try {
-      // eslint-disable-next-line no-console
       await props.Payment(data);
       toast('Pagamento feito com sucesso!');
       props.setShowPaymentConfirm(true);
