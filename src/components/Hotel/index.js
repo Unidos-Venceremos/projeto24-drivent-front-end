@@ -3,12 +3,12 @@ import styled from 'styled-components';
 import { BsPerson, BsPersonFill } from 'react-icons/bs';
 
 import TicketContext from '../../contexts/TicketContext';
+import useTicketByUserId from '../../hooks/api/useTicketbyId.js';
 
 import useHotel from '../../hooks/api/useHotel.js';
 import useHotelBedroom from '../../hooks/api/useHotelBedroom.js';
 
 import { formatAccomodation } from '../../utils/formatters.js';
-import useTicketByUserId from '../../hooks/api/useTicketbyId.js';
 import GreyButton from '../Payment/GreyButton.js';
 
 export default function HotelTab() {
@@ -16,6 +16,7 @@ export default function HotelTab() {
   const [showBedrooms, setShowBedrooms] = useState(false);
   const [selectedHotel, setSelectedHotel] = useState(null);
   const [selectedBedroom, setSelectedBedroom] = useState(null);
+  const [showHotels, setShowHotels] = useState(false);
 
   const { selectTicket, selectHosting } = useContext(TicketContext);
   const { hotel } = useHotel();
@@ -93,6 +94,14 @@ export default function HotelTab() {
     // console.log(selectedBedroom);
   };
 
+  useEffect(() => {
+    const hasPayment = ticket?.Payment;
+
+    if (hasPayment) {
+      setShowHotels(true);
+    }
+  }, [ticket]);
+
   return (
     <>
       <Title>Escolha de hotel e quarto</Title>
@@ -102,59 +111,63 @@ export default function HotelTab() {
       ) : selectTicket.online || selectHosting.withoutHotel ? (
         <SubTitle>Sua modalidade de ingresso não inclui hospedagem Prossiga para a escolha de atividades</SubTitle>
       ) : (
-        <>
-          <SubTitleInfo>Primeiro, escolha seu hotel</SubTitleInfo>
-          {hotels.map((hotel) => (
-            <HotelCard
-              key={hotel.id}
-              onClick={() => handleSelectHotel(hotel.id)}
-              selected={selectedHotel === hotel.id}
-              disabled={!hotel?.vacancies}
-            >
-              <HotelImage src={hotel?.backgroundImageUrl} />
-              <HotelName>{hotel?.name}</HotelName>
-              <HotelDescription>
+        showHotels ? (
+          <>
+            <SubTitleInfo>Primeiro, escolha seu hotel</SubTitleInfo>
+            {hotels.map((hotel) => (
+              <HotelCard
+                key={hotel.id}
+                onClick={() => handleSelectHotel(hotel.id)}
+                selected={selectedHotel === hotel.id}
+                disabled={!hotel?.vacancies}
+              >
+                <HotelImage src={hotel?.backgroundImageUrl} />
+                <HotelName>{hotel?.name}</HotelName>
+                <HotelDescription>
                 Tipos de acomodação:
-                <span>{formatAccomodation(hotel?.accomodationTypes)}</span>
-              </HotelDescription>
-              <HotelDescription>
+                  <span>{formatAccomodation(hotel?.accomodationTypes)}</span>
+                </HotelDescription>
+                <HotelDescription>
                 Vagas disponíveis: <span>{hotel?.vacancies}</span>
-              </HotelDescription>
-            </HotelCard>
-          ))}
+                </HotelDescription>
+              </HotelCard>
+            ))}
 
-          {selectedHotel && (
-            <>
-              <Spacer height={44} />
-              <SubTitleInfo>Ótima pedida! Agora escolha seu quarto</SubTitleInfo>
-              <Spacer height={16} />
-              <BedroomContainer>
-                {hotelBedrooms?.map((bedroom) => (
-                  <BedroomCard
-                    key={bedroom?.id}
-                    onClick={() => handleSelectBedroom(bedroom?.id)}
-                    selected={selectedBedroom === bedroom?.id}
-                    disabled={bedroom?.occupped === bedroom.totalCapacity}
-                  >
-                    <BedroomInfo>
-                      <BedroomNumber>{bedroom.number}</BedroomNumber>
-                      <BedroomVacancies>
-                        {generateVacancies(bedroom?.occupped, bedroom?.totalCapacity, bedroom?.id === selectedBedroom)}
-                      </BedroomVacancies>
-                    </BedroomInfo>
-                  </BedroomCard>
-                ))}
-              </BedroomContainer>
+            {selectedHotel && (
+              <>
+                <Spacer height={44} />
+                <SubTitleInfo>Ótima pedida! Agora escolha seu quarto</SubTitleInfo>
+                <Spacer height={16} />
+                <BedroomContainer>
+                  {hotelBedrooms?.map((bedroom) => (
+                    <BedroomCard
+                      key={bedroom?.id}
+                      onClick={() => handleSelectBedroom(bedroom?.id)}
+                      selected={selectedBedroom === bedroom?.id}
+                      disabled={bedroom?.occupped === bedroom.totalCapacity}
+                    >
+                      <BedroomInfo>
+                        <BedroomNumber>{bedroom.number}</BedroomNumber>
+                        <BedroomVacancies>
+                          {generateVacancies(bedroom?.occupped, bedroom?.totalCapacity, bedroom?.id === selectedBedroom)}
+                        </BedroomVacancies>
+                      </BedroomInfo>
+                    </BedroomCard>
+                  ))}
+                </BedroomContainer>
 
-              {selectedBedroom && (
-                <>
-                  <Spacer height={44} />
-                  <GreyButton onClick={handleBookRoom}>RESERVAR INGRESSO</GreyButton>
-                </>
-              )}
-            </>
-          )}
-        </>
+                {selectedBedroom && (
+                  <>
+                    <Spacer height={44} />
+                    <GreyButton onClick={handleBookRoom}>RESERVAR INGRESSO</GreyButton>
+                  </>
+                )}
+              </>
+            )}
+          </>
+        ) : (
+          <SubTitle>Você precisa ter confirmado pagamento antes de fazer a escolha de hospedagem</SubTitle>
+        )
       )}
     </>
   );
