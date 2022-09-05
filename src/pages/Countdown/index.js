@@ -1,5 +1,6 @@
 import { useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 import Timer from './Timer';
 import Page from '../../components/Page';
@@ -18,6 +19,10 @@ export default function Countdown() {
       navigate('/enroll');
     }
   }, [countdownOver]);
+
+  if (loadingEventInfo) {
+    return 'Loading...';
+  }  
 
   function onZero() {
     navigate('/enroll');
