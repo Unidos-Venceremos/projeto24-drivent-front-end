@@ -62,3 +62,25 @@ export function formatExpirationDate(value) {
 export function formatFormData(data) {
   return Object.keys(data).map((d) => `${d}: ${data[d]}`);
 }
+
+export const formatAccomodation = (accomodation) => {
+  let finalString = '';
+  const lastItem = accomodation.length - 1;
+
+  for (let index = 0; index < accomodation.length; index++) {
+    const item = accomodation[index];
+
+    if (index === lastItem) {
+      finalString += item;
+      continue;
+    }
+
+    if (index === lastItem - 1) {
+      finalString += `${item} e `;
+    } else {
+      finalString += `${item}, `;
+    }
+  }
+
+  return finalString;
+};
