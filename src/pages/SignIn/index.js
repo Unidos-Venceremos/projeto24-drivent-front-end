@@ -1,6 +1,8 @@
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import qs from 'query-string';
+import axios from 'axios';
 
 import AuthLayout from '../../layouts/Auth';
 
@@ -24,19 +26,55 @@ export default function SignIn() {
   const { setUserData } = useContext(UserContext);
 
   const navigate = useNavigate();
-  
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const code = urlParams.get('code');
+
+  useEffect(() => {
+    if(code) {
+      loginWithGitHub();
+    }
+  }, []);
+
+  async function loginWithGitHub() {
+    try {
+      const user = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/oauth`, { code });
+      setUserData(user.data);
+      toast('Login realizado com sucesso!');
+      navigate('/dashboard');
+    } catch (err) {
+      toast('Não foi possível fazer o login!');
+    }
+  }
+
   async function submit(event) {
     event.preventDefault();
 
     try {
       const userData = await signIn(email, password);
       setUserData(userData);
+      console.log('userData: ', userData);
       toast('Login realizado com sucesso!');
       navigate('/dashboard');
     } catch (err) {
       toast('Não foi possível fazer o login!');
     }
   } 
+
+  function redirectToGitHub() {
+    const GITHUB_AUTH_URL = 'https://github.com/login/oauth/authorize';
+    const params = {
+      response_type: 'code',
+      scope: 'user public_repo',
+      client_id: process.env.REACT_APP_CLIENT_ID,
+      redirect_uri: process.env.REACT_APP_REDIRECT_URL,
+      state: 'driven.tt'
+    };
+
+    const queryStrings = qs.stringify(params);
+    const authorizationUrl = `${GITHUB_AUTH_URL}?${queryStrings}`;
+    window.location.href = authorizationUrl;  
+  }
 
   return (
     <AuthLayout background={eventInfo.backgroundImageUrl}>
@@ -51,6 +89,13 @@ export default function SignIn() {
           <Input label="Senha" type="password" fullWidth value={password} onChange={e => setPassword(e.target.value)} />
           <Button type="submit" color="primary" fullWidth disabled={loadingSignIn}>Entrar</Button>
         </form>
+      </Row>
+      <Row>
+        <h2>ou</h2>
+        <Button onClick={redirectToGitHub} fullWidth>
+          <h2>Login usando GitHub</h2>
+          <img src={'https://www.svgrepo.com/show/332401/github.svg'} width="20px" style= { { verticalAlign: 'middle', marginLeft: '8px', marginRight: '8px' } }/>
+        </Button>
       </Row>
       <Row>
         <Link to="/enroll">Não possui login? Inscreva-se</Link>

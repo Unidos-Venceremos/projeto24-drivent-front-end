@@ -1,5 +1,7 @@
-import ActivityTab from '../../../components/Activity/index.js';
+import ActivityTab from '../../../components/Activity';
 
 export default function Activities() {
-  return <ActivityTab />;
+  return (
+    <ActivityTab />
+  );
 }
