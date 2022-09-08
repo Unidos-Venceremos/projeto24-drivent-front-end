@@ -25,7 +25,7 @@ export default function ActivityTab() {
       ) : selectTicket.online ? (
         <SubTitle>Sua modalidade de ingresso não necessita escolher atividade. Você terá acesso a todas as atividades.</SubTitle>
       ) : (
-          <SubTitle>FALTA IMPLEMENTAR</SubTitle>
+        <SubTitle>FALTA IMPLEMENTAR</SubTitle>
       )}
     </>
   );
