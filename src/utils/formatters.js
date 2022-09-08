@@ -1,3 +1,4 @@
+/* eslint-disable indent */
 import Payment from 'payment';
 
 function clearNumber(value = '') {
@@ -20,18 +21,18 @@ export function formatCreditCardNumber(value) {
   let nextValue;
 
   switch (issuer) {
-  case 'amex':
-    nextValue = `${clearValue.slice(0, 4)} ${clearValue.slice(4, 10)} ${clearValue.slice(10, 15)}`;
-    break;
-  case 'dinersclub':
-    nextValue = `${clearValue.slice(0, 4)} ${clearValue.slice(4, 10)} ${clearValue.slice(10, 14)}`;
-    break;
-  default:
-    nextValue = `${clearValue.slice(0, 4)} ${clearValue.slice(4, 8)} ${clearValue.slice(8, 12)} ${clearValue.slice(
-      12,
-      19
-    )}`;
-    break;
+    case 'amex':
+      nextValue = `${clearValue.slice(0, 4)} ${clearValue.slice(4, 10)} ${clearValue.slice(10, 15)}`;
+      break;
+    case 'dinersclub':
+      nextValue = `${clearValue.slice(0, 4)} ${clearValue.slice(4, 10)} ${clearValue.slice(10, 14)}`;
+      break;
+    default:
+      nextValue = `${clearValue.slice(0, 4)} ${clearValue.slice(4, 8)} ${clearValue.slice(8, 12)} ${clearValue.slice(
+        12,
+        19
+      )}`;
+      break;
   }
 
   return nextValue.trim();
@@ -83,4 +84,26 @@ export const formatAccomodation = (accomodation) => {
   }
 
   return finalString;
+};
+
+export const formatActivitiesDate = (date) => {
+  if (!date) return '';
+
+  let dateInIsoString = new Date(date).toISOString();
+  dateInIsoString = dateInIsoString.split('T')[0] + 'T04:00:00.000Z';
+  const dateEvent = new Date(dateInIsoString);
+
+  let weekday =
+    dateEvent
+      .toLocaleDateString('pt-BR', {
+        weekday: 'long',
+      })[0]
+      .toUpperCase() + dateEvent.toLocaleDateString('pt-BR', { weekday: 'long' }).slice(1);
+
+  weekday = weekday?.includes('-') ? weekday.split('-')[0] : weekday;
+
+  const dayEvent = String(dateEvent.getDate()).padStart(2, '0');
+  const monthEvent = String(dateEvent.getMonth() + 1).padStart(2, '0');
+
+  return `${weekday}, ${dayEvent}/${monthEvent}`;
 };
