@@ -107,3 +107,12 @@ export const formatActivitiesDate = (date) => {
 
   return `${weekday}, ${dayEvent}/${monthEvent}`;
 };
+
+export const formatActivitiesTime = (date) => {
+  if (!date) return '';
+
+  let hours = new Date(date).getHours();
+  let minutes = new Date(date).getMinutes();
+
+  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+};

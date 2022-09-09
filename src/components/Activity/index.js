@@ -1,20 +1,27 @@
+/* eslint-disable space-before-function-paren */
+/* eslint-disable indent */
 import { useState, useEffect, useContext } from 'react';
 import styled from 'styled-components';
+import { MdExitToApp } from 'react-icons/md';
+import { AiOutlineCloseCircle } from 'react-icons/ai';
 
 import useActivity from '../../hooks/api/useActivities.js';
 import TicketContext from '../../contexts/TicketContext';
 import useTicketByUserId from '../../hooks/api/useTicketbyId.js';
+import useActivitiesByDate from '../../hooks/api/useActivitiesByDate.js';
 
-import { formatActivitiesDate } from '../../utils/formatters.js';
+import { formatActivitiesDate, formatActivitiesTime } from '../../utils/formatters.js';
 
 export default function ActivityTab(props) {
   const [freeToChoose, setFreeToChoose] = useState(false);
   const [activitiesDate, setActivitiesDate] = useState([]);
   const [selectActivitiesDate, setSelectActivitiesDate] = useState(null);
+  const [locals, setLocals] = useState([]);
 
-  const { activitiesDays } = useActivity();
   const { selectTicket } = useContext(TicketContext);
+  const { activitiesDays } = useActivity();
   const { ticket } = useTicketByUserId();
+  const { activitiesByDate, getActivitiesByDate } = useActivitiesByDate();
   
   useEffect(() => {
     if (ticket) {
@@ -24,19 +31,33 @@ export default function ActivityTab(props) {
   
   useEffect(() => {
     if (activitiesDays) {
-      const activitiesDateFormatted = activitiesDays.map(formatActivitiesDate);
-      setActivitiesDate(activitiesDateFormatted);
+      setActivitiesDate(activitiesDays);
     }
   }, [activitiesDays]);
 
-  const handleSelectActivitiesDate = (date) => {
+  useEffect(() => {
+    if (activitiesByDate) {
+      if (!locals.length) {
+        setLocals(Object.keys(activitiesByDate));
+      }
+    }
+  }, [activitiesByDate]);
+
+  const handleSelectActivitiesDate = async (date) => {
     if (selectActivitiesDate === date) {
       setSelectActivitiesDate(null);
+      setLocals([]);
       return;
     }
 
     setSelectActivitiesDate(date);
-  }
+
+    await getActivitiesByDate(date);
+  };
+
+  const handleSelectActivity = (activity) => {
+    // console.log(activity);
+  };
 
   return (
      <>
@@ -55,13 +76,52 @@ export default function ActivityTab(props) {
               return (
                 <StyledButton
                   onClick={() => handleSelectActivitiesDate(day)}
-                  key={day + index}
+                  key={String(day + index)}
                   selected={selectActivitiesDate === day}
                 >
-                  {day}
+                  {formatActivitiesDate(day)}
                 </StyledButton>
               );
             })}
+            {activitiesByDate && (
+              <>
+                <Spacer height={40} />
+                <TrailContainer>
+                  {locals && locals.map((local, index) => (
+                    <Trail key={String(local + index)}>
+                      <TrailTitle>{local}</TrailTitle>
+                      <TrailContent>
+                        {activitiesByDate[local]?.map((activity, index) => (
+                          <TrailItem key={index} duration={activity.duration || 1}>
+                            <TrailInfoContainer>
+                              <TrailItemTitle>{activity.title}</TrailItemTitle>
+                              <TrailItemSubtitle>{formatActivitiesTime(activity.startsAt)} - {formatActivitiesTime(activity.endsAt)}</TrailItemSubtitle>
+                            </TrailInfoContainer>
+                            <TrailItemButton 
+                              vacancies={activity?.currentVacancies} 
+                              onClick={activity?.currentVacancies > 0 
+                                        ? () => handleSelectActivity(activity) 
+                                        : null}>
+                              {activity?.currentVacancies > 0 ? (
+                                <>
+                                  <MdExitToApp color="#078632" /> 
+                                  <h2>
+                                    {activity?.currentVacancies > 1 ? activity?.currentVacancies + ' Vagas' : activity?.currentVacancies + ' Vaga'}
+                                  </h2>
+                                </>
+                                ) : (
+                                  <>
+                                    <AiOutlineCloseCircle color="#CC6666"/> <h2>Esgotado</h2>
+                                  </>
+                                )}
+                            </TrailItemButton>
+                          </TrailItem>)
+                        )}
+                      </TrailContent>
+                    </Trail>
+                  ))}
+                </TrailContainer>
+              </>)}
           </>
         )}
      </>
@@ -122,4 +182,109 @@ const StyledButton = styled.button`
   border-radius: 4px;
   border: none;
   cursor: pointer;
+`;
+
+const TrailContainer = styled.section`
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  @media (max-width: 500px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const Trail = styled.div`
+  width: 100%;
+  height: 10%;
+`;
+
+const TrailTitle = styled.h3`
+  font-style: normal;
+  font-family: 'Roboto', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 17px;
+  line-height: 20px;
+  margin: 13px 0;
+
+  text-align: center;
+
+  color: #7B7B7B;  
+`;
+
+const TrailContent = styled.div`
+  width: 100%;
+  height: 392px;
+  padding: 10px 9px;
+
+  overflow-y: auto;
+
+  border: 1px solid #D7D7D7;
+`;
+
+const TrailItem = styled.div`
+  width: 100%;
+  min-width: 220px;
+  height: ${(props) => (props.duration === 1 ? 80 : props.duration * 85)}px;
+  padding: 12px 10px;
+  padding-right: 2px;
+  background-color: #F1F1F1;
+  margin-top: 10px;
+  border-radius: 5px;
+
+  display: flex;
+  justify-content: space-between;
+`;
+
+const TrailInfoContainer = styled.div`
+  width: 80%;
+  height: 100%;
+  padding-right: 10px;
+  border-right: 1px solid #CFCFCF;
+`;
+
+const TrailItemTitle = styled.h4`
+  font-family: 'Roboto', sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 14px;
+  color: #343434;
+`;
+
+const TrailItemSubtitle = styled.p`
+  font-family: 'Roboto', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 14px;
+  margin-right: 10px;
+  margin-top: 6px;
+  color: #343434;
+`;
+
+const TrailItemButton = styled.button`
+  border: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  cursor: ${props => props.vacancies > 0 ? 'pointer' : 'not-allowed'};
+  
+  h2 {
+    font-size: 9px; 
+    color: ${(props) => (props.vacancies > 0 ? '#078632' : '#CC6666')};
+  }
+
+  svg {
+    width: 20px;
+    height: 20px;
+    margin-bottom: 4px;
+  }
 `;
