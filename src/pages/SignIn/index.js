@@ -53,7 +53,6 @@ export default function SignIn() {
     try {
       const userData = await signIn(email, password);
       setUserData(userData);
-      console.log('userData: ', userData);
       toast('Login realizado com sucesso!');
       navigate('/dashboard');
     } catch (err) {
