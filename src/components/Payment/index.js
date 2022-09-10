@@ -98,6 +98,7 @@ export default function PaymentTab() {
         />
       ) : (
         <>
+          {console.log('ticket', availableTickets)}
           <SubTitle>Primeiro, escolha sua modalidade de ingresso</SubTitle>
           <Button
             onClick={() => handleSelectTicket(PRESENTIAL)}
