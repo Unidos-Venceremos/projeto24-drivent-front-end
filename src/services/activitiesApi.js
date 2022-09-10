@@ -9,3 +9,13 @@ export async function getAvailableDaysOfActivities(token) {
 
   return response.data;
 }
+
+export async function postUserActivity(token, activityId) {
+  const response = await api.post('/activities/create/' + activityId, null, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return response.data;
+}

@@ -3,12 +3,14 @@
 import { useState, useEffect, useContext } from 'react';
 import styled from 'styled-components';
 import { MdExitToApp } from 'react-icons/md';
-import { AiOutlineCloseCircle } from 'react-icons/ai';
+import { AiOutlineCloseCircle, AiOutlineCheckCircle } from 'react-icons/ai';
+import { toast } from 'react-toastify';
 
 import useActivity from '../../hooks/api/useActivities.js';
 import TicketContext from '../../contexts/TicketContext';
 import useTicketByUserId from '../../hooks/api/useTicketbyId.js';
 import useActivitiesByDate from '../../hooks/api/useActivitiesByDate.js';
+import useUserActivities from '../../hooks/api/useUserActivities.js';
 
 import { formatActivitiesDate, formatActivitiesTime } from '../../utils/formatters.js';
 
@@ -17,11 +19,14 @@ export default function ActivityTab(props) {
   const [activitiesDate, setActivitiesDate] = useState([]);
   const [selectActivitiesDate, setSelectActivitiesDate] = useState(null);
   const [locals, setLocals] = useState([]);
+  const [initialsLocals, setInitialsLocals] = useState([]);
+  const [block, setBlock] = useState(false);
 
   const { selectTicket } = useContext(TicketContext);
   const { activitiesDays } = useActivity();
   const { ticket } = useTicketByUserId();
   const { activitiesByDate, getActivitiesByDate } = useActivitiesByDate();
+  const { postUserActivities } = useUserActivities();
   
   useEffect(() => {
     if (ticket) {
@@ -36,10 +41,15 @@ export default function ActivityTab(props) {
   }, [activitiesDays]);
 
   useEffect(() => {
-    if (activitiesByDate) {
+    if (activitiesByDate && !initialsLocals.length) {
       if (!locals.length) {
-        setLocals(Object.keys(activitiesByDate));
+        const localsInObject = Object.keys(activitiesByDate);
+
+        setLocals(localsInObject);
+        setInitialsLocals(localsInObject);
       }
+    } else {
+      setLocals(initialsLocals);
     }
   }, [activitiesByDate]);
 
@@ -55,8 +65,18 @@ export default function ActivityTab(props) {
     await getActivitiesByDate(date);
   };
 
-  const handleSelectActivity = (activity) => {
-    // console.log(activity);
+  const handleSelectActivity = async (activity) => {
+    try {
+      setBlock(true);
+
+      await postUserActivities(activity.id);
+      await getActivitiesByDate(selectActivitiesDate);
+
+      setBlock(false);
+    } catch (e) {
+      toast(e.response.data.message);
+      setBlock(false);
+    }
   };
 
   return (
@@ -92,17 +112,33 @@ export default function ActivityTab(props) {
                       <TrailTitle>{local}</TrailTitle>
                       <TrailContent>
                         {activitiesByDate[local]?.map((activity, index) => (
-                          <TrailItem key={index} duration={activity.duration || 1}>
+                          <TrailItem 
+                            key={index} 
+                            duration={activity.duration || 1} 
+                            selected={activity?.isParticipant}
+                            disabled={activity?.isParticipant || activity?.currentVacancies === 0 || block}
+                          >
                             <TrailInfoContainer>
                               <TrailItemTitle>{activity.title}</TrailItemTitle>
                               <TrailItemSubtitle>{formatActivitiesTime(activity.startsAt)} - {formatActivitiesTime(activity.endsAt)}</TrailItemSubtitle>
                             </TrailInfoContainer>
                             <TrailItemButton 
-                              vacancies={activity?.currentVacancies} 
-                              onClick={activity?.currentVacancies > 0 
+                              vacancies={activity?.currentVacancies}
+                              disabled={activity?.isParticipant || activity?.currentVacancies === 0 || block}
+                              isParticipant={activity?.isParticipant}
+                              onClick={activity?.currentVacancies > 0 || activity?.isParticipant || activity?.isParticipant || !block
                                         ? () => handleSelectActivity(activity) 
-                                        : null}>
-                              {activity?.currentVacancies > 0 ? (
+                                        : null}
+                                >
+                              {activity?.isParticipant ? (
+                                <>
+                                  <AiOutlineCheckCircle color="#078632" /> 
+                                  <h2>
+                                    Inscrito
+                                  </h2>
+                                </>
+                              ) : (
+                                activity?.currentVacancies > 0 && !activity?.isParticipant ? (
                                 <>
                                   <MdExitToApp color="#078632" /> 
                                   <h2>
@@ -113,10 +149,10 @@ export default function ActivityTab(props) {
                                   <>
                                     <AiOutlineCloseCircle color="#CC6666"/> <h2>Esgotado</h2>
                                   </>
-                                )}
+                                ))}
                             </TrailItemButton>
-                          </TrailItem>)
-                        )}
+                          </TrailItem>
+                        ))}
                       </TrailContent>
                     </Trail>
                   ))}
@@ -233,12 +269,20 @@ const TrailItem = styled.div`
   height: ${(props) => (props.duration === 1 ? 80 : props.duration * 85)}px;
   padding: 12px 10px;
   padding-right: 2px;
-  background-color: #F1F1F1;
+  background-color: ${(props) => (props.selected ? '#D0FFDB' : '#F1F1F1')};
   margin-top: 10px;
   border-radius: 5px;
 
   display: flex;
   justify-content: space-between;
+
+  button {
+    background-color: ${(props) => (props.selected ? '#D0FFDB' : '#F1F1F1')};
+  }
+
+  &:disabled {
+    pointer-events: none;
+  }
 `;
 
 const TrailInfoContainer = styled.div`
@@ -279,12 +323,16 @@ const TrailItemButton = styled.button`
   
   h2 {
     font-size: 9px; 
-    color: ${(props) => (props.vacancies > 0 ? '#078632' : '#CC6666')};
+    color: ${(props) => (props.vacancies > 0 || props.isParticipant ? '#078632' : '#CC6666')};
   }
 
   svg {
     width: 20px;
     height: 20px;
     margin-bottom: 4px;
+  }
+
+  &:disabled {
+    pointer-events: none;
   }
 `;
