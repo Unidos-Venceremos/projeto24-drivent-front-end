@@ -77,7 +77,7 @@ export default function Enroll() {
           <img src={'https://www.svgrepo.com/show/332401/github.svg'} alt ={'github'} width="20px" style= { { verticalAlign: 'middle', marginLeft: '8px', marginRight: '8px' } }/>
         </Button>
       </Row>
-      <Row>
+      <Row marginTop={20}>
         <Link to="/sign-in">Já está inscrito? Faça login</Link>
       </Row>
     </AuthLayout>
