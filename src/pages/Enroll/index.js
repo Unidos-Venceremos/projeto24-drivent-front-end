@@ -1,8 +1,7 @@
-import { useContext, useState, useEffect } from 'react';
+import { useContext, useState } from 'react';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import qs from 'query-string';
-import axios from 'axios';
 
 import AuthLayout from '../../layouts/Auth';
 
@@ -75,7 +74,7 @@ export default function Enroll() {
         <h2>ou</h2>
         <Button onClick={redirectToGitHub} fullWidth>
           <h2>Login com GitHub</h2>
-          <img src={'https://www.svgrepo.com/show/332401/github.svg'} width="20px" style= { { verticalAlign: 'middle', marginLeft: '8px', marginRight: '8px' } }/>
+          <img src={'https://www.svgrepo.com/show/332401/github.svg'} alt ={'github'} width="20px" style= { { verticalAlign: 'middle', marginLeft: '8px', marginRight: '8px' } }/>
         </Button>
       </Row>
       <Row marginTop={20}>

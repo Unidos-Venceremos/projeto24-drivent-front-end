@@ -93,7 +93,7 @@ export default function SignIn() {
         <h2>ou</h2>
         <Button onClick={redirectToGitHub} fullWidth>
           <h2>Login usando GitHub</h2>
-          <img src={'https://www.svgrepo.com/show/332401/github.svg'} width="20px" style= { { verticalAlign: 'middle', marginLeft: '8px', marginRight: '8px' } }/>
+          <img src={'https://www.svgrepo.com/show/332401/github.svg'} alt ={'github'} width="20px" style= { { verticalAlign: 'middle', marginLeft: '8px', marginRight: '8px' } }/>
         </Button>
       </Row>
       <Row marginTop={20}>

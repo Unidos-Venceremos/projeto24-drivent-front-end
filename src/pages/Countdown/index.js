@@ -1,6 +1,5 @@
 import { useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 
 import Timer from './Timer';
 import Page from '../../components/Page';

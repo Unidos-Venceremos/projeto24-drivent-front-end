@@ -1,12 +1,15 @@
 import { useState, useEffect, useContext } from 'react';
 import styled from 'styled-components';
 import { BsPerson, BsPersonFill } from 'react-icons/bs';
+import { toast } from 'react-toastify';
 
 import TicketContext from '../../contexts/TicketContext';
 import useTicketByUserId from '../../hooks/api/useTicketbyId.js';
 
 import useHotel from '../../hooks/api/useHotel.js';
 import useHotelBedroom from '../../hooks/api/useHotelBedroom.js';
+import useBookBedroom from '../../hooks/api/useBookBedroom.js';
+import useBedroomById from '../../hooks/api/useBedroomById.js';
 
 import { formatAccomodation } from '../../utils/formatters.js';
 import GreyButton from '../Payment/GreyButton.js';
@@ -17,11 +20,14 @@ export default function HotelTab() {
   const [selectedHotel, setSelectedHotel] = useState(null);
   const [selectedBedroom, setSelectedBedroom] = useState(null);
   const [showHotels, setShowHotels] = useState(false);
+  const [bookBedroom, setBookBedroom] = useState(false);
 
   const { selectTicket, selectHosting } = useContext(TicketContext);
   const { hotel } = useHotel();
   const { getHotelBedrooms, hotelBedrooms } = useHotelBedroom();
   const { ticket } = useTicketByUserId();
+  const { BookBedrooms } = useBookBedroom();
+  const { getBedroomById, Bedroom } = useBedroomById();
 
   useEffect(() => {
     if (ticket) {
@@ -40,6 +46,8 @@ export default function HotelTab() {
       // eslint-disable-next-line space-before-function-paren
       (async () => {
         await getHotelBedrooms(selectedHotel);
+        //eslint-disable-next-line
+        console.log(hotelBedrooms);
       })();
     }
   }, [selectedHotel]);
@@ -65,21 +73,28 @@ export default function HotelTab() {
     setSelectedBedroom(id);
   };
 
-  const generateVacancies = (occupped, totalCapacity, select) => {
-    if (select) {
-      totalCapacity[totalCapacity.length - 1] = 1;
+  const generateVacancies = (occupped, totalCapacity, select, avaliable) => {
+    let freeToChoose = totalCapacity.length - occupped.length;
+
+    let arrayFree = [];
+
+    for (let i = 0; i < freeToChoose; i++) {
+      arrayFree.push(0);
+    }
+    
+    if (select && avaliable) {
+      arrayFree[arrayFree.length - 1] = 1;
     } else {
-      totalCapacity[totalCapacity.length - 1] = 0;
+      arrayFree[arrayFree.length - 1] = 0;
     }
 
     return (
       <IconsContainer>
-        {totalCapacity.map((value, index) => {
+        {arrayFree.map((value, index) => {
           if (value === 1) {
             return <BsPersonFill key={index} size="25px" fill="#FF4791" />;
           }
-
-          return <BsPerson key={index} size="25px" fill="#333" />;
+          return <BsPerson key={index} size="25px" fill="#3333333" />;
         })}
         {occupped.map((_, index) => (
           <BsPersonFill fill="black" key={index} size="25px" />
@@ -88,10 +103,20 @@ export default function HotelTab() {
     );
   };
 
-  const handleBookRoom = (e) => {
+  const handleBookRoom = async(e) => {
     e.preventDefault();
-    // console.log(selectedHotel);
-    // console.log(selectedBedroom);
+    try {
+      BookBedrooms(selectedHotel, selectedBedroom);
+      getBedroomById(selectedHotel, selectedBedroom);
+      toast('Quarto reservado com sucesso!');
+      setBookBedroom(true);
+    } catch(e) {
+      toast('Erro ao fazer ao reservar quarto');
+      // eslint-disable-next-line no-console
+      console.log(e.message);
+    }
+    // eslint-disable-next-line no-console
+    console.log(Bedroom);
   };
 
   useEffect(() => {
@@ -110,7 +135,25 @@ export default function HotelTab() {
         <SubTitle>Você precisa ter confirmado pagamento antes de fazer a escolha de hospedagem</SubTitle>
       ) : selectTicket.online || selectHosting.withoutHotel ? (
         <SubTitle>Sua modalidade de ingresso não inclui hospedagem Prossiga para a escolha de atividades</SubTitle>
-      ) : (
+      ) : bookBedroom? (<>
+        <HotelCard
+          key={Bedroom.hoteld}
+          selected={true}
+        >
+          <HotelImage src={hotel?.backgroundImageUrl} />
+          <HotelName>{(hotels.filter( (hotel)  => ( hotel.id === Bedroom.hotelId ) )).backgroundImageUrl}</HotelName>
+          <HotelDescription>
+        Quarto Reservado:
+            <span>`${Bedroom.number} (${formatAccomodation(Bedroom.typeRoom)})`</span>
+          </HotelDescription>
+          <HotelDescription>
+        Pessoas no seu Quarto: {(hotels.filter( (hotel)  => ( hotel.id === Bedroom.hotelId ) )).occupped.length > 1 ?
+              <span>Você e mais {(hotels.filter( (hotel)  => ( hotel.id === Bedroom.hotelId ) )).occupped.length - 1 } pessoas</span> : 
+              (<span> Você </span>)}
+          </HotelDescription>
+        </HotelCard>
+        <GreyButton onClick={setBookBedroom(false)}>Trocar de Quarto</GreyButton>
+      </>) : (
         showHotels ? (
           <>
             <SubTitleInfo>Primeiro, escolha seu hotel</SubTitleInfo>
@@ -139,17 +182,17 @@ export default function HotelTab() {
                 <SubTitleInfo>Ótima pedida! Agora escolha seu quarto</SubTitleInfo>
                 <Spacer height={16} />
                 <BedroomContainer>
-                  {hotelBedrooms?.map((bedroom) => (
+                  {hotelBedrooms?.sort((a, b) => a.number - b.number).map((bedroom) => (
                     <BedroomCard
                       key={bedroom?.id}
                       onClick={() => handleSelectBedroom(bedroom?.id)}
                       selected={selectedBedroom === bedroom?.id}
-                      disabled={bedroom?.occupped === bedroom.totalCapacity}
+                      disabled={bedroom?.occupped.length === bedroom?.totalCapacity.length}
                     >
                       <BedroomInfo>
                         <BedroomNumber>{bedroom.number}</BedroomNumber>
                         <BedroomVacancies>
-                          {generateVacancies(bedroom?.occupped, bedroom?.totalCapacity, bedroom?.id === selectedBedroom)}
+                          {generateVacancies(bedroom?.occupped, bedroom?.totalCapacity, bedroom?.id === selectedBedroom, bedroom?.available)}
                         </BedroomVacancies>
                       </BedroomInfo>
                     </BedroomCard>
@@ -276,18 +319,19 @@ const BedroomContainer = styled.div`
   }
 `;
 
-const BedroomCard = styled.div`
+const BedroomCard = styled.button`
   width: 100%;
   min-width: 200px;
   height: 45px;
   background: ${(props) => (props.selected ? '#FFEED2' : '#f1f1f1')};
-  border: 1px solid #cecece;
-  border-radius: 5px;
+  border: 1px solid #CECECE;
+  border-radius: 10px;
   padding: 11px 16px;
 
   display: flex;
   align-items: center;
   justify-content: space-between;
+  
 
   cursor: pointer;
 
@@ -313,7 +357,15 @@ const BedroomInfo = styled.div`
   flex: 1;
 `;
 
-const BedroomNumber = styled.div``;
+const BedroomNumber = styled.p`
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 23px;
+  text-align: center;
+  color: #454545;
+`;
 
 const BedroomVacancies = styled.div``;
 
