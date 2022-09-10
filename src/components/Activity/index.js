@@ -36,35 +36,35 @@ export default function ActivityTab(props) {
     }
 
     setSelectActivitiesDate(date);
-  }
+  };
 
   return (
-     <>
+    <>
       <Title>Escolha de atividades</Title>
-        {!freeToChoose ? (
-          <SubTitle>Você precisa ter confirmado pagamento antes de fazer a escolha de atividades</SubTitle>
-        ) : selectTicket.online ? (
-          <SubTitle>
+      {!freeToChoose ? (
+        <SubTitle>Você precisa ter confirmado pagamento antes de fazer a escolha de atividades</SubTitle>
+      ) : selectTicket.online ? (
+        <SubTitle>
             Sua modalidade de ingresso não necessita escolher atividade. Você terá acesso a todas as atividades.
-          </SubTitle>
-        ) : (
-          <>
-            <SubTitle2>Primeiro, filtre pelo dia do evento: </SubTitle2>
-            <Spacer height={10} />
-            {activitiesDate?.map((day, index) => {
-              return (
-                <StyledButton
-                  onClick={() => handleSelectActivitiesDate(day)}
-                  key={day + index}
-                  selected={selectActivitiesDate === day}
-                >
-                  {day}
-                </StyledButton>
-              );
-            })}
-          </>
-        )}
-     </>
+        </SubTitle>
+      ) : (
+        <>
+          <SubTitle2>Primeiro, filtre pelo dia do evento: </SubTitle2>
+          <Spacer height={10} />
+          {activitiesDate?.map((day, index) => {
+            return (
+              <StyledButton
+                onClick={() => handleSelectActivitiesDate(day)}
+                key={day + index}
+                selected={selectActivitiesDate === day}
+              >
+                {day}
+              </StyledButton>
+            );
+          })}
+        </>
+      )}
+    </>
   );
 }
 
