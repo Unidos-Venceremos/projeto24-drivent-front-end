@@ -27,7 +27,7 @@ export default function HotelTab() {
   const { getHotelBedrooms, hotelBedrooms } = useHotelBedroom();
   const { ticket } = useTicketByUserId();
   const { BookBedrooms } = useBookBedroom();
-  const { getBedroomById, Bedroom } = useBedroomById();
+  const { getBedroomById, bedroom } = useBedroomById();
 
   useEffect(() => {
     if (ticket) {
@@ -48,6 +48,7 @@ export default function HotelTab() {
         await getHotelBedrooms(selectedHotel);
         //eslint-disable-next-line
         console.log(hotelBedrooms);
+        console.log(bedroom);
       })();
     }
   }, [selectedHotel]);
@@ -107,7 +108,7 @@ export default function HotelTab() {
     e.preventDefault();
     try {
       BookBedrooms(selectedHotel, selectedBedroom);
-      getBedroomById(selectedHotel, selectedBedroom);
+      await getBedroomById(selectedHotel, selectedBedroom);
       toast('Quarto reservado com sucesso!');
       setBookBedroom(true);
     } catch(e) {
@@ -116,7 +117,6 @@ export default function HotelTab() {
       console.log(e.message);
     }
     // eslint-disable-next-line no-console
-    console.log(Bedroom);
   };
 
   useEffect(() => {
@@ -136,22 +136,22 @@ export default function HotelTab() {
       ) : selectTicket.online || selectHosting.withoutHotel ? (
         <SubTitle>Sua modalidade de ingresso não inclui hospedagem Prossiga para a escolha de atividades</SubTitle>
       ) : bookBedroom? (<>
-        <HotelCard
-          key={Bedroom.hoteld}
+        {/* <HotelCard
+          key={bedroom.hoteld}
           selected={true}
         >
           <HotelImage src={hotel?.backgroundImageUrl} />
-          <HotelName>{(hotels.filter( (hotel)  => ( hotel.id === Bedroom.hotelId ) )).backgroundImageUrl}</HotelName>
+          <HotelName>{(hotels.filter( (hotel)  => ( hotel.id === bedroom.hotelId ) )).backgroundImageUrl}</HotelName>
           <HotelDescription>
         Quarto Reservado:
-            <span>`${Bedroom.number} (${formatAccomodation(Bedroom.typeRoom)})`</span>
+            <span>`${bedroom.number} (${formatAccomodation(bedroom.typeRoom)})`</span>
           </HotelDescription>
           <HotelDescription>
-        Pessoas no seu Quarto: {(hotels.filter( (hotel)  => ( hotel.id === Bedroom.hotelId ) )).occupped.length > 1 ?
-              <span>Você e mais {(hotels.filter( (hotel)  => ( hotel.id === Bedroom.hotelId ) )).occupped.length - 1 } pessoas</span> : 
+        Pessoas no seu Quarto: {(hotels.filter( (hotel)  => ( hotel.id === bedroom.hotelId ) )).occupped.length > 1 ?
+              <span>Você e mais {(hotels.filter( (hotel)  => ( hotel.id === bedroom.hotelId ) )).occupped.length - 1 } pessoas</span> : 
               (<span> Você </span>)}
           </HotelDescription>
-        </HotelCard>
+        </HotelCard> */}
         <GreyButton onClick={setBookBedroom(false)}>Trocar de Quarto</GreyButton>
       </>) : (
         showHotels ? (

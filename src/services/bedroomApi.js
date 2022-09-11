@@ -21,9 +21,7 @@ export async function getAvailableBedroomsByHotelId(token, hotelId) {
 }
 
 export async function BookBedrooms(token, hotelId, bedroomId) {
-  //eslint-disable-next-line
-  console.log({token})
-  const response = await api.post('/bedrooms/'+ hotelId +'/'+ bedroomId, {
+  const response = await api.post(`/bedrooms/${hotelId}/${bedroomId}`, {}, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
